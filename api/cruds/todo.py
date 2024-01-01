@@ -1,18 +1,17 @@
 from datetime import datetime
 
 import aiomysql
+from fastapi import FastAPI
 
 import api.schemas.todo as todo_schema
-from utils.db import get_db_connection
 
 
-async def create_todo(todo_create: todo_schema.TodoCreate) -> todo_schema.Todo:
-    pool = await get_db_connection()
+async def create_todo(app: FastAPI,
+                      todo_create: todo_schema.TodoCreate) -> todo_schema.Todo:
 
-    async with pool.acquire() as conn:
+    async with app.state.db_pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cursor:
             try:
-                print(todo_create.title)
 
                 insert_query = """INSERT INTO todos (title)
                                 VALUES (%s)"""
@@ -36,10 +35,8 @@ async def create_todo(todo_create: todo_schema.TodoCreate) -> todo_schema.Todo:
             )
 
 
-async def get_todos() -> todo_schema.Todo:
-    pool = await get_db_connection()
-
-    async with pool.acquire() as conn:
+async def get_todos(app: FastAPI) -> todo_schema.Todo:
+    async with app.state.db_pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cursor:
             try:
                 query = "SELECT * FROM todos order by id DESC"
@@ -53,12 +50,10 @@ async def get_todos() -> todo_schema.Todo:
             return result
 
 
-async def update_todo(
-        todo_id: int, todo_update: todo_schema.TodoUpdate
-) -> todo_schema.TodoUpdateResponse:
-    pool = await get_db_connection()
-
-    async with pool.acquire() as conn:
+async def update_todo(app: FastAPI,
+                      todo_id: int, todo_update: todo_schema.TodoUpdate
+                      ) -> todo_schema.TodoUpdateResponse:
+    async with app.state.db_pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cursor:
             try:
 
@@ -91,10 +86,9 @@ async def update_todo(
             )
 
 
-async def delete_todo(todo_id: int) -> str:
-    pool = await get_db_connection()
+async def delete_todo(app: FastAPI, todo_id: int) -> str:
 
-    async with pool.acquire() as conn:
+    async with app.state.db_pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cursor:
             try:
                 # DELETEクエリを実行
@@ -108,32 +102,6 @@ async def delete_todo(todo_id: int) -> str:
                     return "Deletion successful"
                 else:
                     return "No item was deleted"
-
-            finally:
-                await cursor.close()
-                conn.close()
-
-
-async def mark_todo_as_done(todo_id: int) -> str:
-    pool = await get_db_connection()
-
-    async with pool.acquire() as conn:
-        async with conn.cursor(aiomysql.DictCursor) as cursor:
-            try:
-
-                # UPDATEクエリを実行
-                query = """UPDATE todos SET
-                                done = 1
-                            WHERE id = %s"""
-
-                await cursor.execute(query, (todo_id,))
-                await conn.commit()
-
-                # マークが成功したかを確認
-                if cursor.rowcount > 0:
-                    return "Mark successful"
-                else:
-                    return "No item was marked"
 
             finally:
                 await cursor.close()

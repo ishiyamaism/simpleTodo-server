@@ -1,14 +1,12 @@
 from datetime import datetime
 
 import aiomysql
+from fastapi import FastAPI
 
-from utils.db import get_db_connection
 
+async def mark_todo_as_done(app: FastAPI, todo_id: int) -> str:
 
-async def mark_todo_as_done(todo_id: int) -> str:
-    pool = await get_db_connection()
-
-    async with pool.acquire() as conn:
+    async with app.state.db_pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cursor:
             try:
 
@@ -35,10 +33,9 @@ async def mark_todo_as_done(todo_id: int) -> str:
                 conn.close()
 
 
-async def unmark_todo_as_done(todo_id: int) -> str:
-    pool = await get_db_connection()
+async def unmark_todo_as_done(app: FastAPI, todo_id: int) -> str:
 
-    async with pool.acquire() as conn:
+    async with app.state.db_pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cursor:
             try:
 
