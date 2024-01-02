@@ -166,3 +166,4 @@ settings.json
 .DS_Store
 .env
 readme.txt
+nohup.out
