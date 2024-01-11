@@ -29,3 +29,5 @@ class TodoUpdateResponse(TodoUpdate):
 
 class Todo(TodoBase):
     id: int
+    created_at: datetime | None
+    updated_at: datetime | None

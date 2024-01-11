@@ -28,7 +28,7 @@ async def create_todo(app: FastAPI,
                 await cursor.close()
                 conn.close()
 
-            return todo_schema.Todo(
+            return todo_schema.TodoCreateResponse(
                 id=new_id,
                 title=todo_create.title,
                 done=False  # デフォルト値
