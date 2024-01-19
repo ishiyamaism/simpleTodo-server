@@ -63,13 +63,11 @@ async def update_todo(app: FastAPI,
                 # UPDATEクエリを実行
                 query = """UPDATE todos SET
                                 title = %s,
-                                done = %s,
                                 updated_at = %s
                             WHERE id = %s"""
 
                 await cursor.execute(query,
                                      (todo_update.title,
-                                      todo_update.done,
                                       current_time,
                                       todo_id))
                 await conn.commit()

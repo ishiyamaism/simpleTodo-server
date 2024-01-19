@@ -7,19 +7,19 @@ from utils.db import close_db_connection, connect_to_db
 app = FastAPI()
 
 
-# 許可するオリジンのリスト
 origins = [
     "http://localhost:3000",
-    "https://02.kaizentools.net/api",
+    "https://todo.ishiyama-room.com",
+    "https://ishiyama-room.com",
+    "https://www.ishiyama-room.com",
 ]
 
-# CORSミドルウェアの設定
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],  # すべてのHTTPメソッドを許可
-    allow_headers=["*"],  # すべてのHTTPヘッダーを許可
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
