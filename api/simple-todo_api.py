@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -9,9 +11,10 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",
-    "https://todo.ishiyama-room.com",
-    "https://ishiyama-room.com",
-    "https://www.ishiyama-room.com",
+    os.environ.get("URL_TODO_ISHI"),
+    os.environ.get("URL_WWW_ISHI"),
+    os.environ.get("URL_ISHI"),
+    os.environ.get("URL_RENDER"),
 ]
 
 app.add_middleware(
